@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Luyện đọc tiếng Đức</title>
+<title>Luyện đọc</title>
 <style>
-:root{--bg:#f7f5ef;--card:#fff;--tx:#1f2937;--mu:#6b7280;--ac:#2563eb;--act:#fff;--ok:#15803d;--okb:#dcfce7;--bad:#b91c1c;--badb:#fee2e2;--bd:#e5e7eb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ac:#3b82f6;--ok:#86efac;--okb:#14532d;--bad:#fca5a5;--badb:#7f1d1d;--bd:#374151}}
-:root[data-theme="dark"]{--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ac:#3b82f6;--ok:#86efac;--okb:#14532d;--bad:#fca5a5;--badb:#7f1d1d;--bd:#374151}
+:root{--bg:#f7f5ef;--card:#fff;--tx:#1f2937;--mu:#6b7280;--ac:#2563eb;--act:#fff;--ok:#15803d;--okb:#dcfce7;--bad:#b91c1c;--badb:#fee2e2;--bd:#e5e7eb;--gold:#d97706;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ac:#3b82f6;--ok:#86efac;--okb:#14532d;--bad:#fca5a5;--badb:#7f1d1d;--bd:#374151;--gold:#fbbf24}}
+:root[data-theme="dark"]{--bg:#111827;--card:#1f2937;--tx:#f3f4f6;--mu:#9ca3af;--ac:#3b82f6;--ok:#86efac;--okb:#14532d;--bad:#fca5a5;--badb:#7f1d1d;--bd:#374151;--gold:#fbbf24}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--tx);font:18px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 main{max-width:760px;margin:0 auto;padding:20px 16px 40px}
-h1{font-size:24px;margin:0 0 16px;text-align:center}
+h1{font-size:24px;margin:0 0 12px;text-align:center}
 .card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px}
 textarea{width:100%;min-height:180px;font:inherit;padding:12px;border-radius:12px;border:1px solid var(--bd);background:var(--bg);color:var(--tx);resize:vertical}
 button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:12px 20px;cursor:pointer;background:var(--ac);color:var(--act)}
@@ -24,86 +24,243 @@ button.sec{background:transparent;color:var(--ac);border:2px solid var(--ac)}
 .w.ok{background:var(--okb);color:var(--ok)}
 .w.bad,.w.mix{background:var(--okb);color:var(--ok)}
 .w.bad{background:var(--badb);color:var(--bad);font-weight:700}
+.w.dim{opacity:.35}
+.w.rd{color:var(--ac)}
+.w.next{box-shadow:inset 0 -4px 0 var(--ac)}
+.w.now{background:#fde047;color:#111;box-shadow:0 0 0 2px #eab308}
 .cg{color:var(--ok);font-weight:700}
 .cr{background:var(--badb);color:var(--bad);font-weight:700;text-decoration:underline wavy;text-underline-offset:5px;border-radius:4px}
 #dh{margin:0 0 12px;font-size:17px}
 #s2:not(.hide){display:flex;flex-direction:column}
-#res{order:-1}
+#res,#prac{order:-1}
 #score{text-align:center}
-#score b{font-size:56px;display:block;line-height:1.1}
+#score b{font-size:52px;display:block;line-height:1.1}
+.stars{font-size:38px;letter-spacing:4px;color:var(--gold);text-align:center;line-height:1.2}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0;text-align:center}
+.stats div{background:var(--bg);border-radius:12px;padding:8px 4px;font-size:14px;color:var(--mu);line-height:1.3}
+.stats b,#score .stats b{display:block;font-size:22px;color:var(--tx);line-height:1.3}
 .mu{color:var(--mu);font-size:15px}
-#heard{min-height:24px;font-size:18px;color:var(--tx)}
+#heard,#pfb{min-height:24px;font-size:18px;color:var(--tx);text-align:center}
 .hide{display:none}
-#dlg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:9}
-#dlg.hide{display:none}
-.sheet{background:var(--card);color:var(--tx);width:100%;max-width:760px;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:80vh;overflow-y:auto}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.ov.hide{display:none}
+.sheet{background:var(--card);color:var(--tx);width:100%;max-width:760px;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));max-height:85vh;overflow-y:auto}
 .dsec{margin:0 0 14px;font-size:17px;line-height:1.5}
 .dmain{font-size:22px;font-weight:700;margin:2px 0}
 .dsec ol{margin:2px 0 6px;padding-left:22px}
 .dpos{margin-top:6px;color:var(--mu)}
 .sheet h2{margin:0 0 4px;font-size:30px}
-a.btn{display:block;text-align:center;text-decoration:none;font-weight:600;border-radius:12px;padding:14px;background:var(--ac);color:#fff;margin-top:10px}
-.w.now{background:#fde047;color:#111;box-shadow:0 0 0 2px #eab308}
 select{font:inherit;padding:10px;border-radius:12px;border:1px solid var(--bd);background:var(--card);color:var(--tx);max-width:100%}
+.strip{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:0 0 14px;font-size:16px}
+.chip{background:var(--card);border:1px solid var(--bd);border-radius:999px;padding:3px 12px;font-weight:600;color:var(--tx);font-size:16px}
+button.chip{cursor:pointer;color:var(--ac)}
+.seg{display:flex;margin:0 0 12px;border:2px solid var(--ac);border-radius:12px;overflow:hidden}
+.seg button{flex:1;border-radius:0;background:transparent;color:var(--ac);padding:10px}
+.seg button.on{background:var(--ac);color:var(--act)}
+#sentbar{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 10px}
+#sentbar button{padding:6px 16px}
+.pword{font-size:46px;font-weight:800;text-align:center;margin:4px 0;line-height:1.2}
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.bdg{background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:8px;text-align:center;font-size:14px;line-height:1.3}
+.bdg.off{opacity:.4;filter:grayscale(1)}
+.bdg i{display:block;font-size:28px;font-style:normal}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tx);color:var(--bg);padding:10px 16px;border-radius:12px;z-index:20;max-width:90%;text-align:center;font-weight:600}
+#toast.hide{display:none}
+.newb{background:var(--okb);color:var(--ok);border-radius:12px;padding:8px 12px;margin:8px 0;text-align:center;font-weight:600}
 </style>
 </head>
 <body>
 <main>
-<h1>🎤 Luyện đọc tiếng Đức</h1>
+<h1>🎤 Luyện đọc <span class="ln"></span></h1>
+<div class="strip" id="strip"></div>
 
 <section id="s1" class="card">
-  <p><b>Bước 1:</b> Dán đoạn tiếng Đức vào ô dưới đây, hoặc bấm nút để lấy một đoạn văn ngẫu nhiên.</p>
-  <textarea id="inp" placeholder="Deutschen Text hier einfügen..."></textarea>
-  <div class="row"><button id="rand" class="sec">🎲 Tạo đoạn văn ngẫu nhiên</button></div>
+  <p><b>Bước 1:</b> Dán đoạn <span class="ln"></span> vào ô dưới đây, hoặc chọn mức độ rồi bấm nút để lấy một đoạn văn ngẫu nhiên.</p>
+  <textarea id="inp"></textarea>
+  <div class="row">
+    <select id="lvl" aria-label="Mức độ"><option value="all">Mọi mức độ</option><option value="easy">Dễ</option><option value="medium">Vừa</option><option value="hard">Khó</option></select>
+    <select id="len" aria-label="Độ dài"><option value="short">Ngắn (khoảng 50 từ)</option><option value="medium">Vừa (khoảng 100 từ)</option><option value="long" selected>Dài (khoảng 200 từ)</option></select>
+  </div>
+  <div class="row" style="margin-top:10px"><button id="rand" class="sec">🎲 Tạo đoạn văn ngẫu nhiên</button></div>
   <p id="topic" class="mu" style="text-align:center;margin:8px 0 0"></p>
   <div class="row"><button id="go" class="big">Bắt đầu luyện đọc ▶</button></div>
 </section>
 
 <section id="s2" class="hide">
+  <div class="seg" id="seg"><button id="m_all" class="on">📄 Cả đoạn</button><button id="m_sent">✂️ Từng câu</button></div>
+  <div id="sentbar" class="hide"><button id="sprev" class="sec" aria-label="Câu trước">◀</button><b id="snum"></b><button id="snext" class="sec" aria-label="Câu sau">▶</button></div>
   <div class="card">
     <div id="text"></div>
-    <p class="mu" id="hint">Bấm vào bất kỳ từ nào để nghe phát âm mẫu và tra từ điển Cambridge.</p>
+    <p class="mu" id="hint">Bấm vào bất kỳ từ nào để nghe phát âm mẫu và tra nghĩa.</p>
   </div>
-  <button id="play" class="big sec" style="margin-bottom:10px">🔊 Nghe đọc mẫu cả đoạn</button>
-  <div class="row" style="margin:0 0 12px"><select id="voice" aria-label="Giọng đọc"></select><select id="rate" aria-label="Tốc độ"><option value="0.7">Chậm</option><option value="0.85" selected>Vừa</option><option value="1">Bình thường</option></select></div>
-  <button id="mic" class="big">🎙️ Bấm để bắt đầu đọc</button>
-  <p class="mu" id="heard" style="text-align:center"></p>
-  <details class="card" id="alt"><summary><b>📱 Micro không chạy? Đọc bằng bàn phím điện thoại / iPad</b></summary>
-    <p class="mu">Bấm vào ô bên dưới, bấm biểu tượng 🎤 trên bàn phím (bàn phím phải đang ở tiếng Đức) rồi đọc to. Đọc xong bấm “Chấm điểm”.</p>
-    <textarea id="dict" style="min-height:110px" placeholder="Hier tippen, dann das 🎤 auf der Tastatur antippen..."></textarea>
-    <div class="row"><button id="grade">✅ Chấm điểm</button></div>
-  </details>
+
+  <div id="main">
+    <button id="play" class="big sec" style="margin-bottom:10px"></button>
+    <div class="row" style="margin:0 0 12px"><select id="voice" aria-label="Giọng đọc"></select><select id="rate" aria-label="Tốc độ"><option value="0.7">Chậm</option><option value="0.85" selected>Vừa</option><option value="1">Bình thường</option></select></div>
+    <button id="mic" class="big"></button>
+    <p class="mu" id="heard"></p>
+    <details class="card" id="alt"><summary><b>📱 Micro không chạy? Đọc bằng bàn phím điện thoại / iPad</b></summary>
+      <p class="mu">Bấm vào ô bên dưới, bấm biểu tượng 🎤 trên bàn phím (bàn phím phải đang ở đúng ngôn ngữ) rồi đọc to. Đọc xong bấm “Chấm điểm”.</p>
+      <textarea id="dict" style="min-height:110px"></textarea>
+      <div class="row"><button id="grade">✅ Chấm điểm</button></div>
+    </details>
+  </div>
 
   <div id="res" class="card hide">
     <div id="score"></div>
-    <p id="wl" hidden></p>
-    <div class="row">
-      <button id="again" class="sec">🔁 Đọc lại cả đoạn</button>
-      
-    </div>
+    <div class="row" id="rbtn"></div>
   </div>
+
+  <div id="prac" class="card hide">
+    <div class="mu" id="pnum" style="text-align:center"></div>
+    <div class="pword" id="pword"></div>
+    <div class="mu" id="pph" style="text-align:center;min-height:24px"></div>
+    <div class="row" style="margin-top:8px"><button id="psay" class="sec">🔊 Nghe mẫu</button><button id="pdef" class="sec">📖 Nghĩa</button></div>
+    <button id="pmic" class="big" style="margin-top:12px"></button>
+    <p id="pfb"></p>
+    <div class="row"><button id="pskip" class="sec">Bỏ qua ➡️</button><button id="pexit" class="sec">⬅️ Quay lại đoạn văn</button></div>
+  </div>
+
   <div class="row"><button id="back" class="sec">✏️ Đổi đoạn văn khác</button></div>
 </section>
 
 <p class="mu" style="text-align:center">Dùng trình duyệt Chrome, Edge hoặc Safari, có mạng và cho phép dùng micro.</p>
 </main>
 
-<div id="dlg" class="hide"><div class="sheet" role="dialog" aria-modal="true">
+<div id="dlg" class="ov hide"><div class="sheet" role="dialog" aria-modal="true">
   <h2 id="dw"></h2>
   <div class="row" style="justify-content:flex-start;margin:8px 0 12px"><button id="dsay" class="sec">🔊 Nghe lại</button><button id="dx" class="sec">Đóng</button></div>
   <div id="dh"></div>
   <div id="dl"></div>
 </div></div>
 
+<div id="pdlg" class="ov hide"><div class="sheet" role="dialog" aria-modal="true">
+  <h2>📈 Tiến bộ của bạn</h2>
+  <div id="pbody"></div>
+  <div class="row"><button id="pclose" class="sec">Đóng</button><button id="preset" class="sec">Xóa dữ liệu</button></div>
+</div></div>
+<div id="toast" class="hide"></div>
 <script>
+const LANG = 'de', SRLANG = 'de-DE', LN = 'tiếng Đức';
 const $ = id => document.getElementById(id);
-const norm = w => w.toLowerCase().replace(/[’‘]/g, "'").replace(/ß/g, 'ss').replace(/[^a-zäöüéè0-9']/g, '');
-let full = [], words = [], rec = null, listening = false, finalT = '', interim = '', status = [], hw = [];
+const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const norm = w => {
+  const s = w.toLowerCase().replace(/[’‘]/g, "'");
+  return LANG === 'de' ? s.replace(/ß/g, 'ss').replace(/[^a-zäöüéè0-9']/g, '') : s.replace(/[^a-z0-9']/g, '');
+};
+document.querySelectorAll('.ln').forEach(e => e.textContent = LN);
+document.title = 'Luyện đọc ' + LN;
+$('inp').placeholder = LANG === 'de' ? 'Deutschen Text hier einfügen...' : 'Paste English text here...';
+$('dict').placeholder = LANG === 'de' ? 'Hier tippen, dann das 🎤 auf der Tastatur antippen...' : 'Tap here, then tap the 🎤 on the keyboard...';
 
+/* ============ Trạng thái ============ */
+let words = [], sents = [], mode = 'all', si = 0, scope = { a: 0, b: 0 };
+let status = [], hw = [], wordEls = [];
+let sentRes = [], fullRes = null, recorded = false, lastInfo = null;
+let rec = null, listening = false, finalT = '', interim = '', graded = false, errShown = false, netErr = 0, srcText = null;
+let tFirst = 0, tLast = 0, prac = null;
+
+/* ============ Dữ liệu tiến bộ (lưu trên máy) ============ */
+const STORE = 'ld_v1_' + LANG;
+const newData = () => ({ stars: 0, streak: 0, lastDay: '', days: {}, hist: [], badges: {}, fixed: 0, words: 0, sessions: 0, best: 0 });
+let D = newData();
+try { const s = localStorage.getItem(STORE); if (s) D = Object.assign(newData(), JSON.parse(s)); } catch (e) {}
+function saveData() { try { localStorage.setItem(STORE, JSON.stringify(D)); } catch (e) {} }
+const pad2 = n => String(n).padStart(2, '0');
+const dayKey = (d = new Date()) => d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+function streakNow() {
+  if (!D.lastDay) return 0;
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  return (D.lastDay === dayKey() || D.lastDay === dayKey(y)) ? D.streak : 0;
+}
+const BADGES = [
+  { id: 'first', ic: '🌱', n: 'Bước đầu tiên', d: 'Hoàn thành 1 lần luyện đọc', t: d => d.sessions >= 1 },
+  { id: 's10', ic: '💪', n: 'Chăm chỉ', d: 'Luyện đọc 10 lần', t: d => d.sessions >= 10 },
+  { id: 's30', ic: '🏃', n: 'Kiên trì', d: 'Luyện đọc 30 lần', t: d => d.sessions >= 30 },
+  { id: 'sc7', ic: '👍', n: 'Đọc khá', d: 'Đạt điểm 7 trở lên', t: d => d.best >= 7 },
+  { id: 'sc9', ic: '🌟', n: 'Đọc giỏi', d: 'Đạt điểm 9 trở lên', t: d => d.best >= 9 },
+  { id: 'sc10', ic: '🏆', n: 'Điểm tuyệt đối', d: 'Đạt điểm 10', t: d => d.best >= 10 },
+  { id: 'st3', ic: '🔥', n: 'Chuỗi 3 ngày', d: 'Luyện 3 ngày liên tiếp', t: d => d.streak >= 3 },
+  { id: 'st7', ic: '🔥', n: 'Chuỗi 7 ngày', d: 'Luyện 7 ngày liên tiếp', t: d => d.streak >= 7 },
+  { id: 'fx10', ic: '🎯', n: 'Thợ sửa từ', d: 'Sửa đúng 10 từ', t: d => d.fixed >= 10 },
+  { id: 'fx50', ic: '🎯', n: 'Bậc thầy sửa từ', d: 'Sửa đúng 50 từ', t: d => d.fixed >= 50 },
+  { id: 'w1000', ic: '📚', n: 'Đọc 1000 từ', d: 'Tổng cộng đọc 1000 từ', t: d => d.words >= 1000 },
+  { id: 'star30', ic: '⭐', n: 'Sưu tầm sao', d: 'Có 30 sao', t: d => d.stars >= 30 },
+];
+function checkBadges() {
+  const fresh = [];
+  BADGES.forEach(b => { if (!D.badges[b.id] && b.t(D)) { D.badges[b.id] = Date.now(); fresh.push(b); } });
+  return fresh;
+}
+const score = (ok, total) => total ? Math.round(ok / total * 100) / 10 : 0;
+const starsFor = sc => sc >= 9 ? 3 : sc >= 7 ? 2 : sc >= 5 ? 1 : 0;
+function recordSession(sc, r) {
+  const prev = D.hist.length ? D.hist[D.hist.length - 1].sc : null;
+  const day = dayKey(), stars = starsFor(sc);
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  if (D.lastDay !== day) D.streak = (D.lastDay === dayKey(y)) ? D.streak + 1 : 1;
+  D.lastDay = day;
+  D.sessions++; D.words += r.total; D.best = Math.max(D.best, sc); D.stars += stars;
+  const dd = D.days[day] || (D.days[day] = { n: 0, sum: 0 });
+  dd.n++; dd.sum += sc;
+  const wpm = r.secs >= 2 ? Math.round(r.hyp / (r.secs / 60)) : null;
+  D.hist.push({ t: Date.now(), sc, acc: Math.round(r.ok / r.total * 100), wpm, secs: Math.round(r.secs), w: r.total });
+  if (D.hist.length > 200) D.hist.shift();
+  const newB = checkBadges();
+  saveData(); updateStrip();
+  return { stars, prev, newB };
+}
+function updateStrip() {
+  $('strip').innerHTML = '<span class="chip">🔥 ' + streakNow() + ' ngày</span><span class="chip">⭐ ' + D.stars + '</span><span class="chip">🏅 ' + Object.keys(D.badges).length + '/' + BADGES.length + '</span><button class="chip" id="openp">📈 Tiến bộ</button>';
+  $('openp').onclick = openProgress;
+}
+let toastT = null;
+function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hide'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.add('hide'), 4000); }
+function chartSVG() {
+  const W = 320, H = 140, pl = 22, pb = 22, pt = 16, n = 14, bw = (W - pl) / n;
+  let g = '';
+  [0, 5, 10].forEach(v => {
+    const y = H - pb - (v / 10) * (H - pb - pt);
+    g += '<line x1="' + pl + '" x2="' + W + '" y1="' + y + '" y2="' + y + '" style="stroke:var(--bd)"/><text x="0" y="' + (y + 4) + '" font-size="10" style="fill:var(--mu)">' + v + '</text>';
+  });
+  for (let i = 0; i < n; i++) {
+    const d = new Date(); d.setDate(d.getDate() - (n - 1 - i));
+    const e = D.days[dayKey(d)], x = pl + i * bw;
+    if (e) {
+      const avg = e.sum / e.n, h = (avg / 10) * (H - pb - pt), y = H - pb - h;
+      g += '<rect x="' + (x + 3) + '" y="' + y + '" width="' + (bw - 6) + '" height="' + h + '" rx="3" style="fill:var(--ac)"/><text x="' + (x + bw / 2) + '" y="' + (y - 3) + '" font-size="9" text-anchor="middle" style="fill:var(--tx)">' + avg.toFixed(1) + '</text>';
+    }
+    if (i % 2 === 1 || i === n - 1) g += '<text x="' + (x + bw / 2) + '" y="' + (H - 6) + '" font-size="9" text-anchor="middle" style="fill:var(--mu)">' + pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '</text>';
+  }
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" role="img" aria-label="Điểm trung bình theo ngày trong 14 ngày gần nhất">' + g + '</svg>';
+}
+function openProgress() {
+  const recent = D.hist.slice(-7), avg = recent.length ? (recent.reduce((s, x) => s + x.sc, 0) / recent.length).toFixed(1) : '—';
+  let h = '<div class="stats"><div><b>' + D.sessions + '</b>lần luyện</div><div><b>' + (D.sessions ? D.best.toFixed(1) : '—') + '</b>điểm cao nhất</div><div><b>' + avg + '</b>điểm TB 7 lần gần nhất</div></div>';
+  h += '<div class="stats"><div><b>⭐ ' + D.stars + '</b>sao</div><div><b>🔥 ' + streakNow() + '</b>ngày liên tiếp</div><div><b>' + D.fixed + '</b>từ đã sửa đúng</div></div>';
+  h += '<p class="mu" style="margin:8px 0 0"><b>Điểm trung bình mỗi ngày (14 ngày gần nhất)</b></p>' + chartSVG();
+  h += '<p class="mu" style="margin:8px 0 4px"><b>Các lần luyện gần đây</b></p>';
+  if (!D.hist.length) h += '<p class="mu">Chưa có dữ liệu. Hãy luyện đọc một đoạn để bắt đầu nhé!</p>';
+  else h += D.hist.slice(-5).reverse().map(x => { const d = new Date(x.t); return '<div class="mu">' + pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ' · <b>' + x.sc.toFixed(1) + ' điểm</b> · ' + x.w + ' từ' + (x.wpm ? ' · ' + x.wpm + ' từ/phút' : '') + '</div>'; }).join('');
+  h += '<p class="mu" style="margin:12px 0 4px"><b>Huy hiệu</b></p><div class="bgrid">' + BADGES.map(b => '<div class="bdg' + (D.badges[b.id] ? '' : ' off') + '"><i>' + b.ic + '</i><b>' + b.n + '</b><br>' + b.d + '</div>').join('') + '</div>';
+  h += '<p class="mu" style="margin-top:10px">Dữ liệu chỉ được lưu trên thiết bị này, trong trình duyệt đang dùng.</p>';
+  $('pbody').innerHTML = h;
+  $('preset').textContent = 'Xóa dữ liệu'; $('preset').dataset.sure = '';
+  $('pdlg').classList.remove('hide');
+}
+$('pclose').onclick = () => $('pdlg').classList.add('hide');
+$('pdlg').onclick = e => { if (e.target === $('pdlg')) $('pdlg').classList.add('hide'); };
+$('preset').onclick = () => {
+  if (!$('preset').dataset.sure) { $('preset').dataset.sure = '1'; $('preset').textContent = 'Bấm lần nữa để xóa hết'; return; }
+  D = newData(); saveData(); updateStrip(); $('pdlg').classList.add('hide');
+};
+updateStrip();
+
+/* ============ Xử lý đoạn văn ============ */
 function parse(t) {
-  const out = [], re = /(\s*)(\S+)/g;
+  const out = [], re = /(\s*)(\S+)/g, src = t.replace(/\r\n?/g, '\n');
   let m, carry = 0;
-  while ((m = re.exec(t.replace(/\r\n?/g, '\n'))) !== null) {
+  while ((m = re.exec(src)) !== null) {
     const nl = (m[1].match(/\n/g) || []).length + carry;
     const n = norm(m[2]);
     if (!n) { carry = nl; continue; }
@@ -112,6 +269,26 @@ function parse(t) {
   }
   return out;
 }
+function computeSents() {
+  const out = []; let a = 0;
+  words.forEach((w, i) => {
+    const last = i === words.length - 1, nextNl = !last && words[i + 1].nl > 0;
+    const endP = /[.!?…]["'”’)\]]*$/.test(w.raw) && !/^(mr|mrs|ms|dr|st|vs|etc|prof)\.$/i.test(w.raw);
+    const soft = i - a + 1 >= 25 && /[,;:]$/.test(w.raw);
+    if (last || nextNl || endP || soft) { out.push({ a, b: i + 1 }); a = i + 1; }
+  });
+  return out;
+}
+function setScope() {
+  scope = mode === 'all' ? { a: 0, b: words.length } : { a: sents[si].a, b: sents[si].b };
+  $('sentbar').classList.toggle('hide', mode !== 'sent');
+  $('snum').textContent = 'Câu ' + (si + 1) + '/' + sents.length;
+  $('m_all').classList.toggle('on', mode === 'all');
+  $('m_sent').classList.toggle('on', mode === 'sent');
+  $('play').textContent = '🔊 ' + playLabel();
+  setMic();
+}
+const playLabel = () => mode === 'all' ? 'Nghe đọc mẫu cả đoạn' : 'Nghe đọc mẫu câu này';
 function letterSegs(raw, heard) {
   const m = raw.match(/^([^\p{L}\p{N}]*)([\s\S]*?)([^\p{L}\p{N}]*)$/u);
   const lead = m[1], core = [...m[2]], trail = m[3];
@@ -137,29 +314,27 @@ function letterSegs(raw, heard) {
   if (trail) segs.push({ t: trail, ok: null });
   return segs;
 }
+function segsHTML(raw, heard) {
+  return letterSegs(raw, heard).map(g => g.ok === true ? '<span class="cg">' + esc(g.t) + '</span>' : g.ok === false ? '<span class="cr">' + esc(g.t) + '</span>' : esc(g.t)).join('');
+}
 function render() {
-  $('text').innerHTML = '';
+  const T = $('text'); T.innerHTML = ''; wordEls = [];
   words.forEach((w, i) => {
     if (w.nl && i > 0) {
-      $('text').append(document.createElement('br'));
-      if (w.nl > 1) $('text').append(document.createElement('br'));
+      T.append(document.createElement('br'));
+      if (w.nl > 1) T.append(document.createElement('br'));
     }
     const s = document.createElement('span');
-    const bad = status[i] === false;
-    s.className = 'w' + (status[i] === true ? ' ok' : bad ? (typeof hw[i] === 'string' ? ' mix' : ' bad') : '');
-    if (bad && typeof hw[i] === 'string') {
-      letterSegs(w.raw, hw[i]).forEach(g => {
-        const e = document.createElement('span');
-        if (g.ok === true) e.className = 'cg'; else if (g.ok === false) e.className = 'cr';
-        e.textContent = g.t; s.append(e);
-      });
-    } else s.textContent = w.raw;
+    const bad = status[i] === false, hasH = typeof hw[i] === 'string';
+    const dim = mode === 'sent' && !(i >= scope.a && i < scope.b);
+    s.className = 'w' + (status[i] === true ? ' ok' : bad ? (hasH ? ' mix' : ' bad') : '') + (dim ? ' dim' : '');
+    if (bad && hasH) s.innerHTML = segsHTML(w.raw, hw[i]); else s.textContent = w.raw;
     s.onclick = () => {
       speak(w.n);
       const clean = w.raw.toLowerCase().replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
-      openDict(clean, bad ? (typeof hw[i] === 'string' ? hw[i] : null) : undefined);
+      openDict(clean, bad ? (hasH ? hw[i] : null) : undefined);
     };
-    $('text').append(s, ' ');
+    wordEls.push(s); T.append(s, ' ');
   });
 }
 function align(ref, hyp) {
@@ -168,50 +343,74 @@ function align(ref, hyp) {
   for (let j = 0; j <= m; j++) d[0][j] = j;
   for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
     d[i][j] = Math.min(d[i-1][j-1] + (ref[i-1] === hyp[j-1] ? 0 : 1), d[i-1][j] + 1, d[i][j-1] + 1);
-  const res = new Array(n).fill(false), hw = new Array(n).fill(null);
+  const res = new Array(n).fill(false), h = new Array(n).fill(null);
   let i = n, j = m;
   while (i > 0) {
-    if (j > 0 && d[i][j] === d[i-1][j-1] + (ref[i-1] === hyp[j-1] ? 0 : 1)) { res[i-1] = ref[i-1] === hyp[j-1]; hw[i-1] = hyp[j-1]; i--; j--; }
-    else if (d[i][j] === d[i-1][j] + 1) { res[i-1] = false; hw[i-1] = null; i--; }
+    if (j > 0 && d[i][j] === d[i-1][j-1] + (ref[i-1] === hyp[j-1] ? 0 : 1)) { res[i-1] = ref[i-1] === hyp[j-1]; h[i-1] = hyp[j-1]; i--; j--; }
+    else if (d[i][j] === d[i-1][j] + 1) { res[i-1] = false; h[i-1] = null; i--; }
     else j--;
   }
-  return { res, hw };
+  return { res, hw: h };
 }
-let errShown = false, srcText = null, graded = false, netErr = 0;
-async function getMic() {
-  $('heard').textContent = 'Đang xin quyền dùng micro... (hãy bấm "Cho phép" nếu trình duyệt hỏi)';
-  try {
-    const st = await navigator.mediaDevices.getUserMedia({ audio: true });
-    st.getTracks().forEach(t => t.stop());
-    return true;
-  } catch (e) {
-    $('heard').textContent = '⚠️ Không dùng được micro (' + (e.name || 'lỗi') + '). Nếu trang đang mở trong khung xem trước, hãy tải file về và mở bằng Chrome (xem hướng dẫn của Claude), hoặc kiểm tra quyền micro của trình duyệt.';
-    return false;
+
+/* ============ Ghi âm & chấm điểm ============ */
+const say = m => { (prac ? $('pfb') : $('heard')).textContent = m; };
+function setMic() {
+  $('mic').textContent = listening ? '⏹️ Đọc xong — bấm để chấm điểm' : (mode === 'sent' ? '🎙️ Bấm để đọc câu này' : '🎙️ Bấm để bắt đầu đọc');
+  $('mic').classList.toggle('rec', listening && !prac);
+  $('pmic').textContent = listening ? '⏹️ Xong' : '🎙️ Đọc từ này';
+  $('pmic').classList.toggle('rec', listening && !!prac);
+}
+function live() {
+  const hyp = (finalT + interim).split(/\s+/).map(norm).filter(Boolean);
+  let p = scope.a;
+  for (const h of hyp) {
+    const lim = Math.min(p + 6, scope.b);
+    for (let k = p; k < lim; k++) if (words[k].n === h) { p = k + 1; break; }
   }
+  for (let i = scope.a; i < scope.b; i++) {
+    const e = wordEls[i]; if (!e) continue;
+    e.classList.toggle('rd', i < p);
+    e.classList.toggle('next', i === p && p < scope.b);
+  }
+  if (wordEls[p]) wordEls[p].scrollIntoView({ block: 'nearest' });
+}
+function abortRec() {
+  if (!listening) return;
+  listening = false; graded = true;
+  try { rec.abort(); } catch (e) {}
+  setMic();
 }
 async function startRec() {
   stopPlay();
-  errShown = false; graded = false; netErr = 0;
+  errShown = false; graded = false; netErr = 0; tFirst = 0; tLast = 0;
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { $('heard').textContent = 'Trình duyệt này không hỗ trợ nhận giọng nói. Hãy mở bằng Chrome hoặc Edge.'; return; }
-  status = []; hw = []; render(); $('res').classList.add('hide');
-  finalT = ''; interim = ''; $('heard').textContent = 'Đang nghe... Cứ đọc đến hết đoạn, đọc xong hãy bấm nút phía trên để chấm điểm.';
-  rec = new SR(); rec.lang = 'de-DE'; rec.continuous = true; rec.interimResults = true;
+  if (!SR) { say('Trình duyệt này không hỗ trợ nhận giọng nói. Hãy mở bằng Chrome, Edge hoặc Safari.'); return; }
+  if (!prac) {
+    for (let i = scope.a; i < scope.b; i++) { status[i] = undefined; hw[i] = undefined; }
+    if (mode === 'sent') sentRes[si] = undefined; else { fullRes = null; recorded = false; }
+    render(); $('res').classList.add('hide');
+  }
+  finalT = ''; interim = '';
+  say(prac ? 'Đang nghe... hãy đọc từ này.' : 'Đang nghe... Cứ đọc đến hết, đọc xong hãy bấm nút để chấm điểm.');
+  rec = new SR(); rec.lang = SRLANG; rec.continuous = true; rec.interimResults = true;
   rec.onresult = e => {
     interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i];
       if (r.isFinal) finalT += r[0].transcript + ' '; else interim += r[0].transcript;
     }
-    $('heard').textContent = finalT + interim;
+    const now = Date.now(); if (!tFirst) tFirst = now; tLast = now;
+    if (prac) { if ((finalT + interim).trim()) say(finalT + interim); if (finalT.trim()) stopRec(); }
+    else { say(finalT + interim); live(); }
   };
   rec.onerror = e => {
     if (e.error === 'no-speech' || e.error === 'aborted') return;
     if (e.error === 'network' && ++netErr <= 5) return;
-    $('alt').open = true;
+    if (!prac) $('alt').open = true;
     errShown = true; listening = false; setMic();
     const m = { 'not-allowed': 'Chưa có quyền dùng micro.', 'service-not-allowed': 'Trình duyệt chặn nhận giọng nói ở trang này.', 'network': 'Cần có mạng Internet để nhận giọng nói.', 'audio-capture': 'Không tìm thấy micro.' };
-    $('heard').textContent = '⚠️ ' + (m[e.error] || 'Lỗi: ' + e.error) + ' Hãy dùng cách đọc bằng bàn phím ở ô bên dưới.';
+    say('⚠️ ' + (m[e.error] || 'Lỗi: ' + e.error) + (prac ? '' : ' Hãy dùng cách đọc bằng bàn phím ở ô bên dưới.'));
   };
   rec.onend = () => {
     if (interim) { finalT += interim + ' '; interim = ''; }
@@ -225,54 +424,221 @@ async function startRec() {
     } else if (!graded) evaluate();
   };
   listening = true; setMic();
-  try { rec.start(); } catch (e) { errShown = true; listening = false; setMic(); $('heard').textContent = '⚠️ Không bật được nhận giọng nói: ' + e.message; }
+  try { rec.start(); } catch (e) { errShown = true; listening = false; setMic(); say('⚠️ Không bật được nhận giọng nói: ' + e.message); }
 }
 function stopRec() {
   listening = false; setMic();
   try { rec.stop(); } catch (e) {}
   setTimeout(() => { if (!graded) evaluate(); }, 1500);
 }
-function setMic() {
-  $('mic').textContent = listening ? '⏹️ Đọc xong — bấm để chấm điểm' : '🎙️ Bấm để bắt đầu đọc';
-  $('mic').classList.toggle('rec', listening);
+const msgFor = sc => sc >= 9 ? 'Tuyệt vời! 🌟' : sc >= 7 ? 'Khá tốt, cố thêm chút nữa! 👍' : sc >= 5 ? 'Cần luyện thêm các phần chữ đỏ 💪' : 'Đọc chậm và rõ từng từ, thử lại nhé 🙂';
+const fmtTime = s => { const t = Math.round(s); return Math.floor(t / 60) + ':' + pad2(t % 60); };
+function statsHTML(r) {
+  const acc = Math.round(r.ok / r.total * 100), wpm = r.secs >= 2 ? Math.round(r.hyp / (r.secs / 60)) : null;
+  return '<div class="stats"><div><b>' + acc + '%</b>chính xác</div><div><b>' + (wpm ? '≈ ' + wpm : '—') + '</b>từ mỗi phút</div><div><b>' + (r.secs >= 2 ? fmtTime(r.secs) : '—') + '</b>thời gian đọc</div></div>';
+}
+function badWordList() {
+  const m = new Map();
+  words.forEach((w, i) => {
+    if (status[i] !== false) return;
+    if (!m.has(w.n)) m.set(w.n, { n: w.n, raw: w.raw.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, ''), idxs: [] });
+    m.get(w.n).idxs.push(i);
+  });
+  return [...m.values()];
+}
+function sessionAgg() {
+  if (mode === 'all') return fullRes;
+  const r = { ok: 0, total: 0, hyp: 0, secs: 0 };
+  sentRes.forEach(x => { if (x) { r.ok += x.ok; r.total += x.total; r.hyp += x.hyp; r.secs += x.secs; } });
+  return r;
+}
+function setButtons(list) {
+  $('rbtn').innerHTML = '';
+  list.forEach(([t, c, f]) => { const b = document.createElement('button'); b.textContent = t; if (c) b.className = c; b.onclick = f; $('rbtn').append(b); });
+}
+const legend = '<p class="mu" style="text-align:center">Trong mỗi từ, phần <span class="cg">màu xanh</span> là phần đọc đúng, phần <span class="cr">màu đỏ</span> là phần máy nghe chưa đúng. Bấm vào từ để nghe mẫu và xem máy đã nghe thấy gì.</p>';
+function showResult() {
+  const cur = mode === 'sent' ? sentRes[si] : fullRes;
+  const readCount = sentRes.filter(Boolean).length;
+  const done = mode === 'all' || readCount === sents.length;
+  const bad = badWordList().length;
+  let h = '';
+  const btns = [];
+  if (!done) {
+    const sc = score(cur.ok, cur.total);
+    h = '<div class="mu" style="text-align:center">Câu ' + (si + 1) + '/' + sents.length + '</div><b>' + sc.toFixed(1) + ' / 10</b>' + msgFor(sc) +
+      '<div class="mu" style="text-align:center">Đúng ' + cur.ok + '/' + cur.total + ' từ · đã đọc ' + readCount + '/' + sents.length + ' câu</div>';
+    if (cur.ok < cur.total) h += legend;
+    btns.push(['➡️ Câu tiếp theo', '', nextSent], ['🔁 Đọc lại câu này', 'sec', redoSentence]);
+    if (bad) btns.push(['🎯 Luyện ' + bad + ' từ sai', 'sec', startPractice]);
+  } else {
+    const agg = sessionAgg(), sc = score(agg.ok, agg.total);
+    if (!recorded) { recorded = true; lastInfo = recordSession(sc, agg); }
+    const info = lastInfo, st = info.stars;
+    h = '<div class="stars">' + '⭐'.repeat(st) + '☆'.repeat(3 - st) + '</div><b>' + sc.toFixed(1) + ' / 10</b>' + msgFor(sc) + statsHTML(agg);
+    if (info.prev !== null) {
+      const diff = Math.round((sc - info.prev) * 10) / 10;
+      h += '<div class="mu" style="text-align:center">Lần trước: ' + info.prev.toFixed(1) + ' điểm' + (diff > 0 ? ' · tăng ' + diff.toFixed(1) + ' 📈' : diff < 0 ? ' · giảm ' + Math.abs(diff).toFixed(1) : ' · bằng nhau') + '</div>';
+    }
+    info.newB.forEach(b => { h += '<div class="newb">🏅 Huy hiệu mới: ' + b.ic + ' ' + b.n + '</div>'; });
+    h += agg.ok < agg.total ? legend : '<p style="text-align:center">🎉 Không có chữ nào sai!</p>';
+    if (bad) btns.push(['🎯 Luyện ' + bad + ' từ sai', '', startPractice]);
+    btns.push(['🔁 Đọc lại ' + (mode === 'sent' ? 'cả bài' : 'cả đoạn'), 'sec', redoAll]);
+  }
+  $('score').innerHTML = h;
+  setButtons(btns);
+  $('res').classList.remove('hide');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 function evaluate() {
   graded = true;
-  const hyp = (srcText !== null ? srcText : finalT + interim).split(/\s+/).map(norm).filter(Boolean);
-  if (!hyp.length) { if (!errShown) $('heard').textContent = 'Chưa nghe thấy gì. Hãy thử lại nhé!'; return; }
-  const al = align(words.map(w => w.n), hyp);
-  status = al.res; hw = al.hw;
+  const raw = srcText !== null ? srcText : finalT + interim;
+  const hyp = raw.split(/\s+/).map(norm).filter(Boolean);
+  if (prac) { if (!hyp.length) { say('Chưa nghe thấy gì. Thử lại nhé!'); return; } return evalWord(hyp); }
+  if (!hyp.length) { if (!errShown) say('Chưa nghe thấy gì. Hãy thử lại nhé!'); return; }
+  const { a, b } = scope, ref = words.slice(a, b).map(w => w.n), al = align(ref, hyp);
+  for (let i = 0; i < ref.length; i++) { status[a + i] = al.res[i]; hw[a + i] = al.hw[i]; }
   render();
-  const ok = status.filter(Boolean).length;
-  const sc = Math.round(ok / words.length * 100) / 10;
-  const msg = sc >= 9 ? 'Tuyệt vời! 🌟' : sc >= 7 ? 'Khá tốt, cố thêm chút nữa! 👍' : sc >= 5 ? 'Cần luyện thêm các phần chữ đỏ 💪' : 'Đọc chậm và rõ từng từ, thử lại nhé 🙂';
-  $('score').innerHTML = '<b>' + sc.toFixed(1) + ' / 10</b>' + msg + '<div class="mu">Đúng ' + ok + '/' + words.length + ' từ</div>';
-  $('score').innerHTML += (words.length - ok) ? '<p>Trong mỗi từ, phần <span class="cg">màu xanh</span> là phần đọc đúng, phần <span class="cr">màu đỏ</span> là phần máy nghe chưa đúng. Bấm vào từ để nghe mẫu và xem máy đã nghe thấy gì.</p>' : '<p>🎉 Không có chữ nào sai!</p>';
-  $('res').classList.remove('hide');
-  $('heard').textContent = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const secs = tFirst && tLast ? Math.max((tLast - tFirst) / 1000, 1) : 0;
+  const cur = { ok: al.res.filter(Boolean).length, total: ref.length, hyp: hyp.length, secs };
+  if (mode === 'sent') sentRes[si] = cur; else fullRes = cur;
+  say('');
+  showResult();
 }
-const PASSAGES = [{"title": "Ein Tag auf dem Bauernhof", "text": "Im Sommer besuche ich oft meine Großeltern. Sie wohnen auf einem Bauernhof am Rande eines kleinen Dorfes. Schon um sechs Uhr morgens kräht der Hahn, und dann muss man aufstehen. Am Anfang fiel mir das schwer, aber inzwischen mag ich den frühen Morgen sehr.\n\nZuerst gehen wir in den Stall. Dort stehen zehn Kühe, die jeden Tag Milch geben. Mein Großvater melkt sie mit einer Maschine, und ich darf ihnen frisches Heu bringen. Die Kühe haben große braune Augen und sind sehr freundlich. Die kleinste Kuh heißt Berta, und sie leckt mir immer die Hand.\n\nDanach füttern wir die Hühner. Meine Großmutter streut Körner auf den Boden, und die Hühner laufen aufgeregt herbei. Anschließend sammeln wir die Eier ein. Manchmal sind sie noch warm, und ich muss sehr vorsichtig sein, damit keines herunterfällt. Zum Frühstück gibt es dann Rührei mit Brot und Butter.\n\nAm Abend sitzen wir auf der Bank vor dem Haus und schauen zu, wie die Sonne untergeht. Die Luft riecht nach Gras und Blumen, und man hört nur die Grillen. In der Stadt ist es nie so ruhig. Ich bin immer ein bisschen traurig, wenn die Ferien zu Ende gehen. Aber ich weiß, dass ich im nächsten Jahr wiederkomme."}, {"title": "Die vier Jahreszeiten", "text": "In Deutschland gibt es vier Jahreszeiten: Frühling, Sommer, Herbst und Winter. Jede Jahreszeit dauert ungefähr drei Monate, und jede hat ihre eigene Schönheit. Weil sich das Wetter so stark verändert, tragen die Menschen im Laufe des Jahres ganz unterschiedliche Kleidung und machen ganz unterschiedliche Dinge.\n\nDer Sommer ist die wärmste Jahreszeit. Die Tage sind lang, und die Sonne scheint oft bis neun Uhr abends. Die Schule hat sechs Wochen Ferien, und viele Familien fahren ans Meer oder in die Berge. Man isst Eis, schwimmt im See und grillt abends im Garten mit Freunden und Nachbarn.\n\nDer Winter ist kalt und oft dunkel. Manchmal fällt Schnee, und dann bauen die Kinder Schneemänner oder fahren mit dem Schlitten den Hügel hinunter. Im Dezember feiert man Weihnachten. Die Familien schmücken einen Tannenbaum, backen Plätzchen und schenken sich kleine Geschenke. In der Stadt gibt es Weihnachtsmärkte mit Lichtern und warmem Punsch.\n\nWelche Jahreszeit ist deine Lieblingsjahreszeit? Manche Menschen lieben die Wärme des Sommers, andere mögen die ruhige Stimmung im Winter. Ich finde, dass jede Jahreszeit etwas Besonderes hat. Vielleicht ist das der Grund, warum man in Deutschland so gerne über das Wetter spricht."}, {"title": "Ein Besuch im Zoo", "text": "Am Samstag sind wir mit der ganzen Klasse in den Zoo gefahren. Wir haben uns um neun Uhr am Bahnhof getroffen und sind mit dem Zug in die Stadt gefahren. Unsere Lehrerin, Frau Schneider, hatte für jeden einen kleinen Plan mitgebracht. Darauf standen alle Tiere, die wir sehen wollten.\n\nZuerst haben wir die Affen besucht. Sie sprangen von Ast zu Ast und machten laute Geräusche. Ein kleiner Affe hat einem anderen eine Banane weggenommen, und alle Kinder haben gelacht. Der Wärter erzählte uns, dass Affen sehr klug sind und viel von den Menschen lernen können.\n\nAm meisten haben mir die Pinguine gefallen. Sie leben in einem kalten Haus mit einem großen Becken. Unter Wasser schwimmen sie schnell wie kleine Torpedos, und an Land watscheln sie lustig hin und her. Um zwölf Uhr werden sie gefüttert, und alle Besucher dürfen zuschauen.\n\nAm Nachmittag haben wir noch die Löwen und die Giraffen besucht. Dann war es Zeit, nach Hause zu fahren. Im Zug waren alle müde, aber glücklich. Ich habe mir vorgenommen, bald wieder in den Zoo zu gehen, und dieses Mal möchte ich meine Eltern mitbringen."}, {"title": "Gesunde Ernährung", "text": "Was wir essen, hat einen großen Einfluss auf unsere Gesundheit. Wer sich gut ernährt, hat mehr Energie, kann sich besser konzentrieren und wird seltener krank. Deshalb ist es wichtig, dass wir schon als Kinder lernen, welche Lebensmittel gut für uns sind.\n\nEin gesundes Essen enthält viel Obst und Gemüse. Ärzte empfehlen, jeden Tag fünf Portionen zu essen, zum Beispiel einen Apfel, eine Karotte, eine Banane, einen Salat und eine Handvoll Beeren. Obst und Gemüse enthalten Vitamine und Mineralstoffe, die unser Körper dringend braucht.\n\nAuch Getreideprodukte sind wichtig. Vollkornbrot, Haferflocken und Nudeln geben uns lange Kraft, weil sie viele Ballaststoffe enthalten. Weißbrot und Süßigkeiten machen dagegen nur kurz satt, und danach hat man schnell wieder Hunger. Deshalb sollte man sie nur ab und zu essen.\n\nZum Schluss noch ein Tipp: Nimm dir Zeit zum Essen. Setze dich mit der Familie an einen Tisch, schalte den Fernseher aus und iss langsam. So merkst du besser, wann du satt bist, und das Essen schmeckt auch viel besser. Gesund zu leben ist nicht schwer, wenn man mit kleinen Schritten anfängt."}, {"title": "Eine Reise nach Berlin", "text": "Berlin ist die Hauptstadt von Deutschland und mit rund dreieinhalb Millionen Einwohnern auch die größte Stadt des Landes. Jedes Jahr kommen viele Touristen aus der ganzen Welt, um die Geschichte, die Kultur und das moderne Leben der Stadt kennenzulernen.\n\nDas bekannteste Wahrzeichen ist das Brandenburger Tor. Es wurde vor mehr als zweihundert Jahren gebaut und steht mitten in der Stadt. Früher verlief direkt daneben die Berliner Mauer, die Ostberlin und Westberlin fast dreißig Jahre lang trennte. Im Jahr neunzehnhundertneunundachtzig fiel die Mauer, und seitdem ist die Stadt wieder vereint.\n\nHeute kann man noch Reste der Mauer sehen, zum Beispiel an der East Side Gallery. Dort haben Künstler aus vielen Ländern Bilder auf die Mauer gemalt. Es ist die längste Freiluftgalerie der Welt, und der Eintritt ist kostenlos. Viele Besucher machen hier Fotos und denken über die Geschichte nach.\n\nUnd was isst man in Berlin? Sehr beliebt ist die Currywurst, eine Bratwurst mit Ketchup und Currypulver. Ebenso bekannt ist der Döner Kebab, den man an fast jeder Straßenecke bekommt. Zum Nachtisch probiert man einen Berliner, einen süßen Krapfen mit Marmelade. Wer Berlin besucht hat, kommt meistens gerne wieder."}];
-let bag = [];
+function redoAll() {
+  stopPlay(); abortRec();
+  status = []; hw = []; sentRes = []; fullRes = null; recorded = false; si = 0;
+  setScope(); render(); $('res').classList.add('hide'); $('dict').value = ''; say('');
+  window.scrollTo(0, 0);
+}
+function redoSentence() {
+  stopPlay(); abortRec();
+  for (let i = scope.a; i < scope.b; i++) { status[i] = undefined; hw[i] = undefined; }
+  sentRes[si] = undefined; render(); $('res').classList.add('hide'); $('dict').value = ''; say('');
+}
+function goSent(j) {
+  stopPlay(); abortRec();
+  si = Math.max(0, Math.min(sents.length - 1, j));
+  setScope(); render(); $('res').classList.add('hide'); $('dict').value = ''; say('');
+  if (wordEls[scope.a]) wordEls[scope.a].scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+function nextSent() {
+  let j = -1;
+  for (let k = 1; k <= sents.length; k++) { const c = (si + k) % sents.length; if (!sentRes[c]) { j = c; break; } }
+  goSent(j >= 0 ? j : si + 1);
+}
+function setMode(m) {
+  if (m === mode) return;
+  stopPlay(); abortRec();
+  mode = m; si = 0; status = []; hw = []; sentRes = []; fullRes = null; recorded = false;
+  $('res').classList.add('hide'); setScope(); render(); say('');
+}
+
+/* ============ Luyện các từ sai ============ */
+const phCache = {};
+async function getPh(n) {
+  if (n in phCache) return phCache[n];
+  const d = await lookDef(n);
+  return (phCache[n] = (d && (d.phonetic || (d.phonetics || []).map(p => p.text).find(Boolean))) || '');
+}
+function startPractice() {
+  const q = badWordList(); if (!q.length) return;
+  stopPlay(); abortRec();
+  prac = { q, qi: 0, tries: 0, fixed: 0 };
+  $('main').classList.add('hide'); $('res').classList.add('hide'); $('prac').classList.remove('hide');
+  showPracWord(); setMic(); window.scrollTo(0, 0);
+}
+function showPracWord() {
+  const p = prac, it = p.q[p.qi];
+  p.tries = 0;
+  $('pnum').textContent = 'Từ ' + (p.qi + 1) + '/' + p.q.length;
+  $('pword').textContent = it.raw; $('pph').textContent = ''; $('pfb').textContent = 'Bấm 🔊 để nghe mẫu, rồi bấm 🎙️ và đọc từ này.';
+  getPh(it.n).then(ph => { if (prac && prac.q[prac.qi] === it) $('pph').textContent = ph || ''; });
+}
+function evalWord(hyp) {
+  const it = prac.q[prac.qi];
+  if (hyp.includes(it.n) || hyp.join('') === it.n) {
+    it.idxs.forEach(i => { status[i] = true; hw[i] = it.n; });
+    prac.fixed++; D.fixed++;
+    const nb = checkBadges(); saveData(); updateStrip();
+    if (nb.length) toast('🏅 Huy hiệu mới: ' + nb.map(b => b.ic + ' ' + b.n).join(', '));
+    render();
+    $('pword').innerHTML = '<span class="cg">' + esc(it.raw) + '</span>';
+    $('pfb').textContent = '✅ Chuẩn rồi! Giỏi lắm!';
+    setTimeout(nextPrac, 1200);
+  } else {
+    prac.tries++;
+    const heard = hyp.join(' ');
+    $('pword').innerHTML = segsHTML(it.raw, hyp.length === 1 ? hyp[0] : hyp.join(''));
+    $('pfb').innerHTML = 'Máy nghe thành: <b style="color:var(--bad)">' + esc(heard) + '</b>. Nghe mẫu rồi thử lại nhé!' + (prac.tries >= 2 ? '<br><span class="mu">Khó quá? Bấm “Bỏ qua” để sang từ tiếp theo.</span>' : '');
+  }
+}
+function nextPrac() {
+  if (!prac) return;
+  abortRec();
+  prac.qi++;
+  if (prac.qi >= prac.q.length) finishPractice(); else showPracWord();
+}
+function finishPractice() {
+  const p = prac; if (!p) return;
+  abortRec(); prac = null;
+  $('prac').classList.add('hide'); $('main').classList.remove('hide'); setMic();
+  const left = badWordList().length;
+  let h = '<div class="stars">🎯</div><b>' + p.fixed + '/' + p.q.length + '</b>' + (p.fixed === p.q.length ? 'Tuyệt vời! Bạn đã sửa hết các từ sai! 🌟' : 'từ đã đọc đúng khi luyện. Cố gắng thêm nhé! 💪');
+  const btns = [];
+  if (left) btns.push(['🎯 Luyện lại ' + left + ' từ còn sai', '', startPractice]);
+  btns.push(['🔁 Đọc lại ' + (mode === 'sent' ? 'cả bài' : 'cả đoạn'), left ? 'sec' : '', redoAll]);
+  $('score').innerHTML = h; setButtons(btns);
+  $('res').classList.remove('hide'); window.scrollTo(0, 0);
+}
+$('pmic').onclick = () => listening ? stopRec() : startRec();
+$('psay').onclick = () => { if (prac) speak(prac.q[prac.qi].n); };
+$('pdef').onclick = () => { if (prac) openDict(prac.q[prac.qi].raw.toLowerCase()); };
+$('pskip').onclick = nextPrac;
+$('pexit').onclick = finishPractice;
+
+/* ============ Đoạn văn mẫu ============ */
+const PASSAGES = [{"title": "Ein Tag auf dem Bauernhof", "level": "medium", "paras": ["Im Sommer besuche ich oft meine Großeltern. Sie wohnen auf einem Bauernhof am Rande eines kleinen Dorfes. Schon um sechs Uhr morgens kräht der Hahn, und dann muss man aufstehen. Am Anfang fiel mir das schwer, aber inzwischen mag ich den frühen Morgen sehr.", "Zuerst gehen wir in den Stall. Dort stehen zehn Kühe, die jeden Tag Milch geben. Mein Großvater melkt sie mit einer Maschine, und ich darf ihnen frisches Heu bringen. Die Kühe haben große braune Augen und sind sehr freundlich. Die kleinste Kuh heißt Berta, und sie leckt mir immer die Hand.", "Danach füttern wir die Hühner. Meine Großmutter streut Körner auf den Boden, und die Hühner laufen aufgeregt herbei. Anschließend sammeln wir die Eier ein. Manchmal sind sie noch warm, und ich muss sehr vorsichtig sein, damit keines herunterfällt. Zum Frühstück gibt es dann Rührei mit Brot und Butter.", "Am Abend sitzen wir auf der Bank vor dem Haus und schauen zu, wie die Sonne untergeht. Die Luft riecht nach Gras und Blumen, und man hört nur die Grillen. In der Stadt ist es nie so ruhig. Ich bin immer ein bisschen traurig, wenn die Ferien zu Ende gehen. Aber ich weiß, dass ich im nächsten Jahr wiederkomme."]}, {"title": "Die vier Jahreszeiten", "level": "medium", "paras": ["In Deutschland gibt es vier Jahreszeiten: Frühling, Sommer, Herbst und Winter. Jede Jahreszeit dauert ungefähr drei Monate, und jede hat ihre eigene Schönheit. Weil sich das Wetter so stark verändert, tragen die Menschen im Laufe des Jahres ganz unterschiedliche Kleidung und machen ganz unterschiedliche Dinge.", "Der Sommer ist die wärmste Jahreszeit. Die Tage sind lang, und die Sonne scheint oft bis neun Uhr abends. Die Schule hat sechs Wochen Ferien, und viele Familien fahren ans Meer oder in die Berge. Man isst Eis, schwimmt im See und grillt abends im Garten mit Freunden und Nachbarn.", "Der Winter ist kalt und oft dunkel. Manchmal fällt Schnee, und dann bauen die Kinder Schneemänner oder fahren mit dem Schlitten den Hügel hinunter. Im Dezember feiert man Weihnachten. Die Familien schmücken einen Tannenbaum, backen Plätzchen und schenken sich kleine Geschenke. In der Stadt gibt es Weihnachtsmärkte mit Lichtern und warmem Punsch.", "Welche Jahreszeit ist deine Lieblingsjahreszeit? Manche Menschen lieben die Wärme des Sommers, andere mögen die ruhige Stimmung im Winter. Ich finde, dass jede Jahreszeit etwas Besonderes hat. Vielleicht ist das der Grund, warum man in Deutschland so gerne über das Wetter spricht."]}, {"title": "Ein Besuch im Zoo", "level": "medium", "paras": ["Am Samstag sind wir mit der ganzen Klasse in den Zoo gefahren. Wir haben uns um neun Uhr am Bahnhof getroffen und sind mit dem Zug in die Stadt gefahren. Unsere Lehrerin, Frau Schneider, hatte für jeden einen kleinen Plan mitgebracht. Darauf standen alle Tiere, die wir sehen wollten.", "Zuerst haben wir die Affen besucht. Sie sprangen von Ast zu Ast und machten laute Geräusche. Ein kleiner Affe hat einem anderen eine Banane weggenommen, und alle Kinder haben gelacht. Der Wärter erzählte uns, dass Affen sehr klug sind und viel von den Menschen lernen können.", "Am meisten haben mir die Pinguine gefallen. Sie leben in einem kalten Haus mit einem großen Becken. Unter Wasser schwimmen sie schnell wie kleine Torpedos, und an Land watscheln sie lustig hin und her. Um zwölf Uhr werden sie gefüttert, und alle Besucher dürfen zuschauen.", "Am Nachmittag haben wir noch die Löwen und die Giraffen besucht. Dann war es Zeit, nach Hause zu fahren. Im Zug waren alle müde, aber glücklich. Ich habe mir vorgenommen, bald wieder in den Zoo zu gehen, und dieses Mal möchte ich meine Eltern mitbringen."]}, {"title": "Gesunde Ernährung", "level": "medium", "paras": ["Was wir essen, hat einen großen Einfluss auf unsere Gesundheit. Wer sich gut ernährt, hat mehr Energie, kann sich besser konzentrieren und wird seltener krank. Deshalb ist es wichtig, dass wir schon als Kinder lernen, welche Lebensmittel gut für uns sind.", "Ein gesundes Essen enthält viel Obst und Gemüse. Ärzte empfehlen, jeden Tag fünf Portionen zu essen, zum Beispiel einen Apfel, eine Karotte, eine Banane, einen Salat und eine Handvoll Beeren. Obst und Gemüse enthalten Vitamine und Mineralstoffe, die unser Körper dringend braucht.", "Auch Getreideprodukte sind wichtig. Vollkornbrot, Haferflocken und Nudeln geben uns lange Kraft, weil sie viele Ballaststoffe enthalten. Weißbrot und Süßigkeiten machen dagegen nur kurz satt, und danach hat man schnell wieder Hunger. Deshalb sollte man sie nur ab und zu essen.", "Zum Schluss noch ein Tipp: Nimm dir Zeit zum Essen. Setze dich mit der Familie an einen Tisch, schalte den Fernseher aus und iss langsam. So merkst du besser, wann du satt bist, und das Essen schmeckt auch viel besser. Gesund zu leben ist nicht schwer, wenn man mit kleinen Schritten anfängt."]}, {"title": "Eine Reise nach Berlin", "level": "medium", "paras": ["Berlin ist die Hauptstadt von Deutschland und mit rund dreieinhalb Millionen Einwohnern auch die größte Stadt des Landes. Jedes Jahr kommen viele Touristen aus der ganzen Welt, um die Geschichte, die Kultur und das moderne Leben der Stadt kennenzulernen.", "Das bekannteste Wahrzeichen ist das Brandenburger Tor. Es wurde vor mehr als zweihundert Jahren gebaut und steht mitten in der Stadt. Früher verlief direkt daneben die Berliner Mauer, die Ostberlin und Westberlin fast dreißig Jahre lang trennte. Vor mehr als dreißig Jahren fiel die Mauer, und seitdem ist die Stadt wieder vereint.", "Heute kann man noch Reste der Mauer sehen, zum Beispiel an einem langen Stück im Osten der Stadt. Dort haben Künstler aus vielen Ländern Bilder auf die Mauer gemalt. Es ist die längste Freiluftgalerie der Welt, und der Eintritt ist kostenlos. Viele Besucher machen hier Fotos und denken über die Geschichte nach.", "Und was isst man in Berlin? Sehr beliebt ist die Currywurst, eine Bratwurst mit Ketchup und Currypulver. Ebenso bekannt ist der Döner Kebab, den man an fast jeder Straßenecke bekommt. Zum Nachtisch probiert man einen Berliner, einen süßen Krapfen mit Marmelade. Wer Berlin besucht hat, kommt meistens gerne wieder."]}, {"title": "Gia đình tôi (Meine Familie)", "level": "easy", "paras": ["Ich heiße Lena und bin neun Jahre alt. Ich wohne mit meiner Mutter, meinem Vater und meinem kleinen Bruder in einem Haus. Mein Bruder heißt Tim, und er ist vier Jahre alt. Wir haben auch eine Katze. Sie heißt Mimi und ist schwarz.", "Am Wochenende essen wir zusammen Frühstück. Mein Vater macht Brötchen, und meine Mutter kocht Tee. Danach gehen wir im Park spazieren oder spielen im Garten. Ich habe meine Familie sehr gern, weil wir viel lachen und viel zusammen machen."]}, {"title": "Đường đến trường (Mein Schulweg)", "level": "easy", "paras": ["Jeden Morgen stehe ich um sieben Uhr auf. Ich wasche mich, ziehe mich an und frühstücke. Dann nehme ich meine Schultasche und gehe zur Schule. Der Weg ist nicht weit, nur zehn Minuten zu Fuß. Unterwegs treffe ich oft meine Freundin Sara.", "In der Schule lernen wir Mathe, Deutsch und Musik. Am liebsten habe ich Sport, denn wir spielen oft Fußball. Um ein Uhr ist die Schule aus. Dann gehe ich nach Hause, esse zu Mittag und mache meine Hausaufgaben."]}, {"title": "Thời tiết hôm nay (Das Wetter heute)", "level": "easy", "paras": ["Heute scheint die Sonne, und der Himmel ist blau. Es ist warm, aber nicht zu heiß. Die Vögel singen auf den Bäumen, und die Kinder spielen draußen auf dem Spielplatz. Ich trage ein leichtes Hemd und eine kurze Hose.", "Gestern hat es geregnet, und es war kalt. Morgen soll es wieder regnen. Deshalb gehen wir heute Nachmittag ins Schwimmbad. Ich freue mich schon sehr, denn Schwimmen ist mein Lieblingssport. Danach essen wir ein Eis."]}];
+const LV = { easy: 'Dễ', medium: 'Vừa', hard: 'Khó' };
+const bag = {};
 $('rand').onclick = () => {
-  if (!PASSAGES.length) return;
-  if (!bag.length) bag = PASSAGES.map((_, i) => i).sort(() => Math.random() - 0.5);
-  const p = PASSAGES[bag.pop()];
-  $('inp').value = p.text; $('inp').scrollTop = 0;
-  $('topic').textContent = '📚 Chủ đề: ' + p.title + ' · ' + p.text.split(/\s+/).length + ' từ. Bấm Bắt đầu luyện đọc, hoặc bấm lại để đổi đoạn khác.';
+  const lv = $('lvl').value, ln = $('len').value;
+  let pool = PASSAGES.map((_, i) => i).filter(i => lv === 'all' || PASSAGES[i].level === lv), note = '';
+  if (!pool.length) { pool = PASSAGES.map((_, i) => i).filter(i => PASSAGES[i].level === 'medium'); note = 'Chưa có đoạn mức này cho ' + LN + ', đã dùng mức Vừa. '; }
+  if (!pool.length) return;
+  let b = (bag[lv] || []).filter(i => pool.includes(i));
+  if (!b.length) b = pool.slice().sort(() => Math.random() - 0.5);
+  const idx = b.pop(); bag[lv] = b;
+  const p = PASSAGES[idx], np = ln === 'short' ? 1 : ln === 'medium' ? 2 : p.paras.length;
+  const text = p.paras.slice(0, np).join('\n\n');
+  $('inp').value = text; $('inp').scrollTop = 0;
+  $('topic').textContent = '📚 ' + p.title + ' · mức ' + LV[p.level] + ' · ' + text.split(/\s+/).length + ' từ. ' + note + 'Bấm Bắt đầu luyện đọc, hoặc bấm lại để đổi đoạn khác.';
 };
 $('inp').addEventListener('input', () => { $('topic').textContent = ''; });
 $('go').onclick = () => {
-  full = parse($('inp').value);
-  if (!full.length) { $('inp').focus(); return; }
-  words = full; status = []; hw = []; render();
+  words = parse($('inp').value);
+  if (!words.length) { $('inp').focus(); return; }
+  sents = computeSents(); mode = 'all'; si = 0; status = []; hw = []; sentRes = []; fullRes = null; recorded = false; prac = null;
+  setScope(); render(); say('');
   $('s1').classList.add('hide'); $('s2').classList.remove('hide');
+  $('res').classList.add('hide'); $('prac').classList.add('hide'); $('main').classList.remove('hide');
+  window.scrollTo(0, 0);
 };
 $('mic').onclick = () => listening ? stopRec() : startRec();
-$('grade').onclick = () => { srcText = $('dict').value; errShown = false; evaluate(); srcText = null; };
+$('grade').onclick = () => { srcText = $('dict').value; errShown = false; tFirst = 0; tLast = 0; evaluate(); srcText = null; };
+$('m_all').onclick = () => setMode('all');
+$('m_sent').onclick = () => setMode('sent');
+$('sprev').onclick = () => goSent(si - 1);
+$('snext').onclick = () => goSent(si + 1);
+$('back').onclick = () => {
+  stopPlay(); abortRec(); prac = null;
+  $('s2').classList.add('hide'); $('s1').classList.remove('hide');
+  $('res').classList.add('hide'); $('prac').classList.add('hide'); $('main').classList.remove('hide');
+  $('inp').value = ''; $('dict').value = ''; $('heard').textContent = ''; $('topic').textContent = ''; $('inp').focus();
+};
+setMic();
 
-const LANG = 'de';
-const esc = x => String(x).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+/* ============ Tra từ ============ */
 async function getJSON(url) {
   const c = new AbortController(), t = setTimeout(() => c.abort(), 8000);
   try {
@@ -321,7 +687,7 @@ async function openDict(n, info) {
     h += '</div>';
   }
   if (def && def.meanings && def.meanings.length) {
-    h += '<div class="dsec"><b>📖 Định nghĩa (tiếng Đức)</b>';
+    h += '<div class="dsec"><b>📖 Định nghĩa (tiếng Anh)</b>';
     def.meanings.slice(0, 3).forEach(m => {
       h += '<div class="dpos"><i>' + esc(m.partOfSpeech || '') + '</i></div><ol>';
       (m.definitions || []).slice(0, 2).forEach(d => {
@@ -338,6 +704,8 @@ async function openDict(n, info) {
 }
 $('dx').onclick = () => $('dlg').classList.add('hide');
 $('dlg').onclick = e => { if (e.target === $('dlg')) $('dlg').classList.add('hide'); };
+
+/* ============ Đọc mẫu (TTS) ============ */
 let voices = [], playing = false, tmr = null, spansP = [], playId = 0;
 function loadVoices() {
   try { voices = speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().replace('_', '-').startsWith(LANG)); } catch (e) { voices = []; }
@@ -350,7 +718,7 @@ function hl(k) { spansP.forEach((s, i) => s.classList.toggle('now', i === k)); }
 function mkUtt(text) {
   const u = new SpeechSynthesisUtterance(text);
   const v = voices[$('voice').value];
-  u.lang = v ? v.lang.replace('_', '-') : (LANG === 'en' ? 'de-DE' : 'de-DE');
+  u.lang = v ? v.lang.replace('_', '-') : SRLANG;
   if (v) u.voice = v;
   u.rate = +$('rate').value || 0.85; u.volume = 1;
   return u;
@@ -359,11 +727,11 @@ function stopPlay() {
   playId++;
   try { speechSynthesis.cancel(); } catch (e) {}
   clearTimeout(tmr); playing = false; hl(-1);
-  $('play').textContent = '🔊 Nghe đọc mẫu cả đoạn';
+  $('play').textContent = '🔊 ' + playLabel();
 }
 function failPlay() {
   stopPlay();
-  $('heard').textContent = '⚠️ Máy chưa phát được giọng đọc. Trên Android: vào Cài đặt → Hệ thống → Ngôn ngữ → Chuyển văn bản thành giọng nói, chọn "Speech Services by Google" và tải giọng tiếng Đức; kiểm tra âm lượng phương tiện và thử chọn giọng khác. Trên iPhone: tắt chế độ im lặng và tăng âm lượng.';
+  say('⚠️ Máy chưa phát được giọng đọc. Trên Android: vào Cài đặt → Hệ thống → Ngôn ngữ → Chuyển văn bản thành giọng nói, chọn "Speech Services by Google" và tải giọng đọc; kiểm tra âm lượng phương tiện và thử chọn giọng khác. Trên iPhone: tắt chế độ im lặng và tăng âm lượng.');
 }
 function speak(t) {
   stopPlay();
@@ -374,15 +742,16 @@ function speak(t) {
 function playAll() {
   if (playing) { stopPlay(); return; }
   if (listening) return;
-  spansP = [...$('text').querySelectorAll('.w')];
+  spansP = wordEls;
   if (!spansP.length) return;
-  $('heard').textContent = '';
+  say('');
   const chunks = []; let cur = [];
-  words.forEach((w, i) => {
+  for (let i = scope.a; i < scope.b; i++) {
+    const w = words[i];
     if (cur.length && w.nl) { chunks.push(cur); cur = []; }
     cur.push(i);
     if (/[.!?;:]$/.test(w.raw) || cur.length >= 10) { chunks.push(cur); cur = []; }
-  });
+  }
   if (cur.length) chunks.push(cur);
   const id = ++playId; let ci = 0;
   playing = true; $('play').textContent = '⏹️ Dừng đọc mẫu';
@@ -427,17 +796,6 @@ $('play').onclick = playAll;
 try { speechSynthesis.onvoiceschanged = loadVoices; } catch (e) {}
 loadVoices();
 [500, 1500, 3000].forEach(ms => setTimeout(() => { if (!voices.length) loadVoices(); }, ms));
-$('again').onclick = () => { $('dict').value = ''; words = full; status = []; hw = []; render(); $('res').classList.add('hide'); window.scrollTo(0, 0); };
-if ($('fix')) $('fix').onclick = () => {
-  const seen = new Set(), bad = [];
-  words.forEach((w, i) => { if (!status[i] && !seen.has(w.n)) { seen.add(w.n); bad.push(w); } });
-  $('dict').value = ''; words = bad; status = []; hw = []; render(); $('res').classList.add('hide'); window.scrollTo(0, 0);
-};
-$('back').onclick = () => {
-  if (listening) { listening = false; try { rec.abort(); } catch (e) {} setMic(); }
-  $('s2').classList.add('hide'); $('s1').classList.remove('hide'); $('res').classList.add('hide');
-  $('inp').value = ''; $('dict').value = ''; $('heard').textContent = ''; $('inp').focus();
-};
 </script>
 </body>
 </html>
