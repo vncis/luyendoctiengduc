@@ -95,8 +95,18 @@ button.chip{cursor:pointer;color:var(--ac)}
   <div id="main">
     <button id="play" class="big sec" style="margin-bottom:10px"></button>
     <div class="row" style="margin:0 0 12px"><select id="voice" aria-label="Giọng đọc"></select><select id="rate" aria-label="Tốc độ"><option value="0.7">Chậm</option><option value="0.85" selected>Vừa</option><option value="1">Bình thường</option></select></div>
+    <div class="row" style="margin:0 0 12px"><label class="mu">Độ khắt khe khi chấm: <select id="tol"><option value="lenient">Dễ tính</option><option value="normal" selected>Bình thường</option><option value="strict">Nghiêm</option></select></label></div>
     <button id="mic" class="big"></button>
     <p class="mu" id="heard"></p>
+    <details class="card"><summary><b>💡 Mẹo để máy nghe chính xác hơn</b></summary>
+      <ul class="mu" style="margin:8px 0 0;padding-left:20px">
+        <li>Ngồi nơi yên tĩnh, tắt tivi và nhạc nền.</li>
+        <li>Cầm điện thoại cách miệng khoảng 15 đến 20 cm và không che micro.</li>
+        <li>Đọc với tốc độ tự nhiên, không đọc từng chữ rời rạc và cũng không đọc quá nhanh.</li>
+        <li>Nếu phòng ồn, thử tai nghe có dây có micro.</li>
+        <li>Nếu thấy máy chấm khó quá, chọn <b>Dễ tính</b> ở ô “Độ khắt khe khi chấm”: các từ đồng âm (ví dụ to, too, two) và từ gần giống được tính là đúng.</li>
+        <li>Nếu vẫn kém, thử Chrome hoặc Edge trên máy tính, hoặc dùng cách đọc bằng bàn phím ở ô bên dưới.</li>
+      </ul></details>
     <details class="card" id="alt"><summary><b>📱 Micro không chạy? Đọc bằng bàn phím điện thoại / iPad</b></summary>
       <p class="mu">Bấm vào ô bên dưới, bấm biểu tượng 🎤 trên bàn phím (bàn phím phải đang ở đúng ngôn ngữ) rồi đọc to. Đọc xong bấm “Chấm điểm”.</p>
       <textarea id="dict" style="min-height:110px"></textarea>
@@ -156,7 +166,7 @@ let words = [], sents = [], mode = 'all', si = 0, scope = { a: 0, b: 0 };
 let status = [], hw = [], wordEls = [];
 let sentRes = [], fullRes = null, recorded = false, lastInfo = null;
 let rec = null, listening = false, finalT = '', interim = '', graded = false, errShown = false, netErr = 0, srcText = null;
-let tFirst = 0, tLast = 0, prac = null;
+let tFirst = 0, tLast = 0, prac = null, finalAlts = [], usePhrases = true, phrasesTried = false;
 
 /* ============ Dữ liệu tiến bộ (lưu trên máy) ============ */
 const STORE = 'ld_v1_' + LANG;
@@ -335,20 +345,82 @@ function render() {
     wordEls.push(s); T.append(s, ' ');
   });
 }
+
+let tol = 'normal';
+try { const t = localStorage.getItem('ld_tol'); if (t === 'lenient' || t === 'strict' || t === 'normal') tol = t; } catch (e) {}
+$('tol').value = tol;
+$('tol').onchange = () => { tol = $('tol').value; try { localStorage.setItem('ld_tol', tol); } catch (e) {} };
+const HOMO = [['to','too','two'],['there','their',"they're"],['here','hear'],['write','right','rite'],['no','know'],['see','sea'],['be','bee'],['by','buy','bye'],['for','four','fore'],['one','won'],['son','sun'],['hi','high'],['meet','meat'],['eye','i','aye'],['our','hour'],['would','wood'],['ate','eight'],['new','knew'],['whole','hole'],['which','witch'],['weak','week'],['wait','weight'],['flower','flour'],['plain','plane'],['bear','bare'],['dear','deer'],['tail','tale'],['sale','sail'],['pair','pear','pare'],['steal','steel'],['sight','site','cite'],['role','roll'],['peace','piece'],['passed','past'],['break','brake'],['great','grate'],['mail','male'],['hair','hare'],['due','dew'],['fair','fare'],['its',"it's"],['your',"you're"],['whose',"who's"],['weather','whether'],['night','knight'],['not','knot'],['nose','knows'],['sell','cell'],['sent','cent','scent'],['made','maid'],['main','mane'],['none','nun'],['or','oar','ore'],['pause','paws'],['rain','reign','rein'],['road','rode'],['some','sum'],['way','weigh'],['wear','ware'],['toe','tow'],['die','dye'],['heal','heel'],['sew','so','sow'],['stair','stare'],['tide','tied'],['waist','waste'],['vain','vein'],['mist','missed'],['flew','flu'],['ok','okay']];
+const homoMap = new Map();
+if (LANG === 'en') HOMO.forEach((g, i) => g.forEach(w => homoMap.set(norm(w), i)));
+const sameSound = (a, b) => homoMap.has(a) && homoMap.get(a) === homoMap.get(b);
+function sim(a, b) {
+  const x = [...a], y = [...b], n = x.length, m = y.length;
+  if (!n || !m) return 0;
+  let prev = new Array(m + 1).fill(0);
+  for (let i = 1; i <= n; i++) {
+    const cur = new Array(m + 1).fill(0);
+    for (let j = 1; j <= m; j++) cur[j] = x[i-1] === y[j-1] ? prev[j-1] + 1 : Math.max(prev[j], cur[j-1]);
+    prev = cur;
+  }
+  return 2 * prev[m] / (n + m);
+}
+function credit(ref, h) {
+  if (h == null) return 0;
+  if (ref === h) return 1;
+  if (tol !== 'strict' && sameSound(ref, h)) return 1;
+  if (tol === 'strict' || ref.length < 4 || h.length < 3) return 0;
+  const s = sim(ref, h);
+  if (tol === 'lenient' && s >= 0.75) return 1;
+  return s >= 0.6 ? s : 0;
+}
 function align(ref, hyp) {
-  const n = ref.length, m = hyp.length, d = [];
+  const n = ref.length, m = hyp.length, d = [], EPS = 1e-9;
   for (let i = 0; i <= n; i++) { d[i] = new Array(m + 1).fill(0); d[i][0] = i; }
   for (let j = 0; j <= m; j++) d[0][j] = j;
   for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
-    d[i][j] = Math.min(d[i-1][j-1] + (ref[i-1] === hyp[j-1] ? 0 : 1), d[i-1][j] + 1, d[i][j-1] + 1);
-  const res = new Array(n).fill(false), h = new Array(n).fill(null);
+    d[i][j] = Math.min(d[i-1][j-1] + (1 - credit(ref[i-1], hyp[j-1])), d[i-1][j] + 1, d[i][j-1] + 1);
+  const res = new Array(n).fill(false), cred = new Array(n).fill(0), h = new Array(n).fill(null);
   let i = n, j = m;
   while (i > 0) {
-    if (j > 0 && d[i][j] === d[i-1][j-1] + (ref[i-1] === hyp[j-1] ? 0 : 1)) { res[i-1] = ref[i-1] === hyp[j-1]; h[i-1] = hyp[j-1]; i--; j--; }
-    else if (d[i][j] === d[i-1][j] + 1) { res[i-1] = false; h[i-1] = null; i--; }
+    const c = j > 0 ? credit(ref[i-1], hyp[j-1]) : 0;
+    if (j > 0 && Math.abs(d[i][j] - (d[i-1][j-1] + (1 - c))) < EPS) { cred[i-1] = c; res[i-1] = c === 1; h[i-1] = hyp[j-1]; i--; j--; }
+    else if (Math.abs(d[i][j] - (d[i-1][j] + 1)) < EPS) { res[i-1] = false; h[i-1] = null; i--; }
     else j--;
   }
-  return { res, hw: h };
+  return { res, cred, hw: h };
+}
+function segCost(win, hyp) {
+  const n = win.length, m = hyp.length, d = [];
+  for (let i = 0; i <= n; i++) { d[i] = new Array(m + 1).fill(0); d[i][0] = i; }
+  for (let j = 0; j <= m; j++) d[0][j] = j;
+  for (let i = 1; i <= n; i++) for (let j = 1; j <= m; j++)
+    d[i][j] = Math.min(d[i-1][j-1] + (1 - credit(win[i-1], hyp[j-1])), d[i-1][j] + 1, d[i][j-1] + 1);
+  let best = Infinity, used = 0;
+  for (let i = 0; i <= n; i++) if (d[i][m] < best - 1e-9) { best = d[i][m]; used = i; }
+  return { cost: best, used };
+}
+const toks = t => String(t).split(/\s+/).map(norm).filter(Boolean);
+function segList() { return srcText !== null ? [[srcText]] : finalAlts.concat(interim.trim() ? [[interim]] : []); }
+function bestHyp() {
+  const ref = words.slice(scope.a, scope.b).map(w => w.n), out = [];
+  let p = 0;
+  for (const alts of segList()) {
+    const cands = alts.map(toks).filter(h => h.length);
+    if (!cands.length) continue;
+    let pick = cands[0], used = 0, bestC = Infinity;
+    cands.forEach(h => {
+      const r = segCost(ref.slice(p, p + Math.ceil(h.length * 1.5) + 3), h);
+      if (r.cost < bestC - 1e-9) { bestC = r.cost; pick = h; used = r.used; }
+    });
+    p += used; out.push(...pick);
+  }
+  return out;
+}
+function practiceTokens() {
+  const set = new Set();
+  segList().forEach(alts => alts.forEach(a => toks(a).forEach(t => set.add(t))));
+  return [...set];
 }
 
 /* ============ Ghi âm & chấm điểm ============ */
@@ -375,14 +447,27 @@ async function startRec() {
     if (mode === 'sent') sentRes[si] = undefined; else { fullRes = null; recorded = false; }
     render(); $('res').classList.add('hide');
   }
-  finalT = ''; interim = '';
+  finalT = ''; interim = ''; finalAlts = [];
   say(prac ? 'Đang nghe... hãy đọc từ này.' : 'Đang nghe... Cứ đọc đến hết, đọc xong hãy bấm nút để chấm điểm.');
   rec = new SR(); rec.lang = SRLANG; rec.continuous = true; rec.interimResults = true;
+  try { rec.maxAlternatives = 5; } catch (e) {}
+  if (usePhrases) {
+    try {
+      if ('phrases' in rec && typeof SpeechRecognitionPhrase !== 'undefined') {
+        const list = prac ? [prac.q[prac.qi].n] : [...new Set(words.slice(scope.a, scope.b).map(w => w.n))].slice(0, 200);
+        rec.phrases = list.map(p => new SpeechRecognitionPhrase(p, 3.0));
+      }
+    } catch (e) { usePhrases = false; }
+  }
   rec.onresult = e => {
     interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i];
-      if (r.isFinal) finalT += r[0].transcript + ' '; else interim += r[0].transcript;
+      if (r.isFinal) {
+        finalT += r[0].transcript + ' ';
+        const alts = []; for (let k = 0; k < r.length; k++) if (r[k] && r[k].transcript) alts.push(r[k].transcript);
+        finalAlts.push(alts);
+      } else interim += r[0].transcript;
     }
     const now = Date.now(); if (!tFirst) tFirst = now; tLast = now;
     if (prac) { if ((finalT + interim).trim()) say(finalT + interim); if (finalT.trim()) stopRec(); }
@@ -391,13 +476,18 @@ async function startRec() {
   rec.onerror = e => {
     if (e.error === 'no-speech' || e.error === 'aborted') return;
     if (e.error === 'network' && ++netErr <= 5) return;
+    if (usePhrases && (e.error === 'phrases-not-supported' || e.error === 'language-not-supported') && !phrasesTried) {
+      phrasesTried = true; usePhrases = false; listening = false; graded = true;
+      try { rec.abort(); } catch (x) {}
+      setTimeout(startRec, 150); return;
+    }
     if (!prac) $('alt').open = true;
     errShown = true; listening = false; setMic();
     const m = { 'not-allowed': 'Chưa có quyền dùng micro.', 'service-not-allowed': 'Trình duyệt chặn nhận giọng nói ở trang này.', 'network': 'Cần có mạng Internet để nhận giọng nói.', 'audio-capture': 'Không tìm thấy micro.' };
     say('⚠️ ' + (m[e.error] || 'Lỗi: ' + e.error) + (prac ? '' : ' Hãy dùng cách đọc bằng bàn phím ở ô bên dưới.'));
   };
   rec.onend = () => {
-    if (interim) { finalT += interim + ' '; interim = ''; }
+    if (interim.trim()) { finalT += interim + ' '; finalAlts.push([interim]); interim = ''; }
     if (listening) {
       setTimeout(() => {
         if (!listening) return;
@@ -432,15 +522,15 @@ function badWordList() {
 }
 function sessionAgg() {
   if (mode === 'all') return fullRes;
-  const r = { ok: 0, total: 0, hyp: 0, secs: 0 };
-  sentRes.forEach(x => { if (x) { r.ok += x.ok; r.total += x.total; r.hyp += x.hyp; r.secs += x.secs; } });
+  const r = { ok: 0, exact: 0, total: 0, hyp: 0, secs: 0 };
+  sentRes.forEach(x => { if (x) { r.ok += x.ok; r.exact += x.exact; r.total += x.total; r.hyp += x.hyp; r.secs += x.secs; } });
   return r;
 }
 function setButtons(list) {
   $('rbtn').innerHTML = '';
   list.forEach(([t, c, f]) => { const b = document.createElement('button'); b.textContent = t; if (c) b.className = c; b.onclick = f; $('rbtn').append(b); });
 }
-const legend = '<p class="mu" style="text-align:center">Trong mỗi từ, phần <span class="cg">màu xanh</span> là phần đọc đúng, phần <span class="cr">màu đỏ</span> là phần máy nghe chưa đúng. Bấm vào từ để nghe mẫu và xem máy đã nghe thấy gì.</p>';
+const legend = '<p class="mu" style="text-align:center">Trong mỗi từ, phần <span class="cg">màu xanh</span> là phần đọc đúng, phần <span class="cr">màu đỏ</span> là phần máy nghe chưa đúng (từ gần đúng được tính một phần điểm). Bấm vào từ để nghe mẫu và xem máy đã nghe thấy gì.</p>';
 function showResult() {
   const cur = mode === 'sent' ? sentRes[si] : fullRes;
   const readCount = sentRes.filter(Boolean).length;
@@ -451,8 +541,8 @@ function showResult() {
   if (!done) {
     const sc = score(cur.ok, cur.total);
     h = '<div class="mu" style="text-align:center">Câu ' + (si + 1) + '/' + sents.length + '</div><b>' + sc.toFixed(1) + ' / 10</b>' + msgFor(sc) +
-      '<div class="mu" style="text-align:center">Đúng ' + cur.ok + '/' + cur.total + ' từ · đã đọc ' + readCount + '/' + sents.length + ' câu</div>';
-    if (cur.ok < cur.total) h += legend;
+      '<div class="mu" style="text-align:center">Đúng ' + cur.exact + '/' + cur.total + ' từ · đã đọc ' + readCount + '/' + sents.length + ' câu</div>';
+    if (cur.exact < cur.total) h += legend;
     btns.push(['➡️ Câu tiếp theo', '', nextSent], ['🔁 Đọc lại câu này', 'sec', redoSentence]);
     if (bad) btns.push(['🎯 Luyện ' + bad + ' từ sai', 'sec', startPractice]);
   } else {
@@ -465,7 +555,7 @@ function showResult() {
       h += '<div class="mu" style="text-align:center">Lần trước: ' + info.prev.toFixed(1) + ' điểm' + (diff > 0 ? ' · tăng ' + diff.toFixed(1) + ' 📈' : diff < 0 ? ' · giảm ' + Math.abs(diff).toFixed(1) : ' · bằng nhau') + '</div>';
     }
     info.newB.forEach(b => { h += '<div class="newb">🏅 Huy hiệu mới: ' + b.ic + ' ' + b.n + '</div>'; });
-    h += agg.ok < agg.total ? legend : '<p style="text-align:center">🎉 Không có chữ nào sai!</p>';
+    h += agg.exact < agg.total ? legend : '<p style="text-align:center">🎉 Không có chữ nào sai!</p>';
     if (bad) btns.push(['🎯 Luyện ' + bad + ' từ sai', '', startPractice]);
     btns.push(['🔁 Đọc lại ' + (mode === 'sent' ? 'cả bài' : 'cả đoạn'), 'sec', redoAll]);
   }
@@ -477,14 +567,14 @@ function showResult() {
 function evaluate() {
   graded = true;
   const raw = srcText !== null ? srcText : finalT + interim;
-  const hyp = raw.split(/\s+/).map(norm).filter(Boolean);
+  const hyp = prac ? practiceTokens() : bestHyp();
   if (prac) { if (!hyp.length) { say('Chưa nghe thấy gì. Thử lại nhé!'); return; } return evalWord(hyp); }
   if (!hyp.length) { if (!errShown) say('Chưa nghe thấy gì. Hãy thử lại nhé!'); return; }
   const { a, b } = scope, ref = words.slice(a, b).map(w => w.n), al = align(ref, hyp);
   for (let i = 0; i < ref.length; i++) { status[a + i] = al.res[i]; hw[a + i] = al.hw[i]; }
   render();
   const secs = tFirst && tLast ? Math.max((tLast - tFirst) / 1000, 1) : 0;
-  const cur = { ok: al.res.filter(Boolean).length, total: ref.length, hyp: hyp.length, secs };
+  const cur = { ok: al.cred.reduce((x, y) => x + y, 0), exact: al.res.filter(Boolean).length, total: ref.length, hyp: hyp.length, secs };
   if (mode === 'sent') sentRes[si] = cur; else fullRes = cur;
   say('');
   showResult();
@@ -541,7 +631,9 @@ function showPracWord() {
 }
 function evalWord(hyp) {
   const it = prac.q[prac.qi];
-  if (hyp.includes(it.n) || hyp.join('') === it.n) {
+  const need = tol === 'strict' ? 1 : 0.8;
+  const bestC = Math.max(credit(it.n, hyp.join('')), ...hyp.map(h => credit(it.n, h)));
+  if (bestC >= need) {
     it.idxs.forEach(i => { status[i] = true; hw[i] = it.n; });
     prac.fixed++; D.fixed++;
     const nb = checkBadges(); saveData(); updateStrip();
@@ -552,8 +644,9 @@ function evalWord(hyp) {
     setTimeout(nextPrac, 1200);
   } else {
     prac.tries++;
-    const heard = hyp.join(' ');
-    $('pword').innerHTML = segsHTML(it.raw, hyp.length === 1 ? hyp[0] : hyp.join(''));
+    const heard = (finalT + interim).trim() || hyp.join(' ');
+    const near = hyp.slice().sort((x, y) => sim(it.n, y) - sim(it.n, x))[0];
+    $('pword').innerHTML = segsHTML(it.raw, near);
     $('pfb').innerHTML = 'Máy nghe thành: <b style="color:var(--bad)">' + esc(heard) + '</b>. Nghe mẫu rồi thử lại nhé!' + (prac.tries >= 2 ? '<br><span class="mu">Khó quá? Bấm “Bỏ qua” để sang từ tiếp theo.</span>' : '');
   }
 }
