@@ -166,7 +166,7 @@ let words = [], sents = [], mode = 'all', si = 0, scope = { a: 0, b: 0 };
 let status = [], hw = [], wordEls = [];
 let sentRes = [], fullRes = null, recorded = false, lastInfo = null;
 let rec = null, listening = false, finalT = '', interim = '', graded = false, errShown = false, netErr = 0, srcText = null;
-let tFirst = 0, tLast = 0, prac = null, finalAlts = [], usePhrases = true, phrasesTried = false;
+let tFirst = 0, tLast = 0, prac = null, finalAlts = [], noSoundT = null;
 
 /* ============ Dữ liệu tiến bộ (lưu trên máy) ============ */
 const STORE = 'ld_v1_' + LANG;
@@ -432,6 +432,7 @@ function setMic() {
   $('pmic').classList.toggle('rec', listening && !!prac);
 }
 function abortRec() {
+  clearTimeout(noSoundT);
   if (!listening) return;
   listening = false; graded = true;
   try { rec.abort(); } catch (e) {}
@@ -449,16 +450,8 @@ async function startRec() {
   }
   finalT = ''; interim = ''; finalAlts = [];
   say(prac ? 'Đang nghe... hãy đọc từ này.' : 'Đang nghe... Cứ đọc đến hết, đọc xong hãy bấm nút để chấm điểm.');
-  rec = new SR(); rec.lang = SRLANG; rec.continuous = true; rec.interimResults = true;
-  try { rec.maxAlternatives = 5; } catch (e) {}
-  if (usePhrases) {
-    try {
-      if ('phrases' in rec && typeof SpeechRecognitionPhrase !== 'undefined') {
-        const list = prac ? [prac.q[prac.qi].n] : [...new Set(words.slice(scope.a, scope.b).map(w => w.n))].slice(0, 200);
-        rec.phrases = list.map(p => new SpeechRecognitionPhrase(p, 3.0));
-      }
-    } catch (e) { usePhrases = false; }
-  }
+  rec = new SR(); rec.lang = SRLANG; rec.continuous = !prac; rec.interimResults = true;
+  try { rec.maxAlternatives = 3; } catch (e) {}
   rec.onresult = e => {
     interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -470,17 +463,17 @@ async function startRec() {
       } else interim += r[0].transcript;
     }
     const now = Date.now(); if (!tFirst) tFirst = now; tLast = now;
-    if (prac) { if ((finalT + interim).trim()) say(finalT + interim); if (finalT.trim()) stopRec(); }
+    clearTimeout(noSoundT);
+    if (prac) {
+      const t = (finalT + interim).trim(); if (t) say(t);
+      const it = prac.q[prac.qi], need = tol === 'strict' ? 1 : 0.8;
+      if (toks(t).some(h => credit(it.n, h) >= need) || finalT.trim()) stopRec();
+    }
     else say(finalT + interim);
   };
   rec.onerror = e => {
     if (e.error === 'no-speech' || e.error === 'aborted') return;
     if (e.error === 'network' && ++netErr <= 5) return;
-    if (usePhrases && (e.error === 'phrases-not-supported' || e.error === 'language-not-supported') && !phrasesTried) {
-      phrasesTried = true; usePhrases = false; listening = false; graded = true;
-      try { rec.abort(); } catch (x) {}
-      setTimeout(startRec, 150); return;
-    }
     if (!prac) $('alt').open = true;
     errShown = true; listening = false; setMic();
     const m = { 'not-allowed': 'Chưa có quyền dùng micro.', 'service-not-allowed': 'Trình duyệt chặn nhận giọng nói ở trang này.', 'network': 'Cần có mạng Internet để nhận giọng nói.', 'audio-capture': 'Không tìm thấy micro.' };
@@ -488,19 +481,26 @@ async function startRec() {
   };
   rec.onend = () => {
     if (interim.trim()) { finalT += interim + ' '; finalAlts.push([interim]); interim = ''; }
-    if (listening) {
+    if (listening && !prac) {
       setTimeout(() => {
         if (!listening) return;
         try { rec.start(); } catch (e) {
           setTimeout(() => { if (listening) { try { rec.start(); } catch (e2) {} } }, 400);
         }
       }, 150);
-    } else if (!graded) evaluate();
+    } else if (!graded) { listening = false; setMic(); evaluate(); }
   };
   listening = true; setMic();
-  try { rec.start(); } catch (e) { errShown = true; listening = false; setMic(); say('⚠️ Không bật được nhận giọng nói: ' + e.message); }
+  try { rec.start(); } catch (e) { errShown = true; listening = false; setMic(); say('⚠️ Không bật được nhận giọng nói: ' + e.message); return; }
+  clearTimeout(noSoundT);
+  noSoundT = setTimeout(() => {
+    if (!listening || tFirst) return;
+    say('⚠️ Chưa nhận được âm thanh nào. Hãy kiểm tra micro và âm lượng, nói gần hơn một chút' + (prac ? ', rồi bấm nút và đọc lại.' : ', hoặc dùng cách đọc bằng bàn phím ở ô bên dưới.'));
+    if (!prac) $('alt').open = true;
+  }, 8000);
 }
 function stopRec() {
+  clearTimeout(noSoundT);
   listening = false; setMic();
   try { rec.stop(); } catch (e) {}
   setTimeout(() => { if (!graded) evaluate(); }, 1500);
