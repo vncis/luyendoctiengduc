@@ -438,13 +438,13 @@ function abortRec() {
   try { rec.abort(); } catch (e) {}
   setMic();
 }
-let evN = 0, endN = 0, lastErr = '';
+let evN = 0, endN = 0, lastErr = '', fastFails = 0, useCont = true;
 function newRec() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const r0 = new SR(); r0.lang = SRLANG; r0.continuous = !prac; r0.interimResults = true;
+  const r0 = new SR(); r0.lang = SRLANG; r0.continuous = !prac && useCont; r0.interimResults = true; r0._t0 = Date.now(); r0._got = false;
   try { r0.maxAlternatives = 3; } catch (e) {}
   r0.onresult = e => {
-    evN++;
+    evN++; r0._got = true; fastFails = 0;
     interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
       const r = e.results[i];
@@ -479,12 +479,20 @@ function newRec() {
     if (r0 !== rec) return;
     if (interim.trim()) { finalT += interim + ' '; finalAlts.push([interim]); interim = ''; }
     if (listening && !prac) {
+      const fast = !r0._got && Date.now() - r0._t0 < 1500;
+      if (fast) { fastFails++; if (fastFails >= 2) useCont = false; } else fastFails = 0;
+      if (fastFails >= 5) {
+        listening = false; setMic(); errShown = true; clearTimeout(noSoundT);
+        say('⚠️ Trình duyệt liên tục ngắt nhận giọng nói ngay khi bật (chẩn đoán: ' + endN + ' lần ngắt, lỗi: ' + (lastErr || 'không') + '). Hãy tải lại trang rồi thử lại, hoặc dùng cách đọc bằng bàn phím ở ô bên dưới.');
+        $('alt').open = true;
+        return;
+      }
       setTimeout(() => {
         if (!listening) return;
         try { rec = newRec(); rec.start(); } catch (e) {
-          setTimeout(() => { if (listening) { try { rec = newRec(); rec.start(); } catch (e2) {} } }, 400);
+          setTimeout(() => { if (listening) { try { rec = newRec(); rec.start(); } catch (e2) {} } }, 600);
         }
-      }, 200);
+      }, 250 + fastFails * 500);
     } else if (!graded) {
       listening = false; setMic();
       setTimeout(() => { if (!graded) evaluate(); }, prac ? 250 : 700);
@@ -502,6 +510,8 @@ async function startRec() {
     if (mode === 'sent') sentRes[si] = undefined; else { fullRes = null; recorded = false; }
     render(); $('res').classList.add('hide');
   }
+  fastFails = 0;
+  try { if (rec) { const o = rec; rec = null; o.abort(); } } catch (e) {}
   finalT = ''; interim = ''; finalAlts = [];
   say(prac ? 'Đang nghe... hãy đọc từ này.' : 'Đang nghe... Cứ đọc đến hết, đọc xong hãy bấm nút để chấm điểm.');
   rec = newRec();
@@ -584,7 +594,7 @@ function evaluate() {
   const raw = srcText !== null ? srcText : finalT + interim;
   let hyp = prac ? practiceTokens() : bestHyp();
   if (!hyp.length) hyp = toks(raw);
-  const diag = ' (chẩn đoán: ' + evN + ' kết quả, ' + endN + ' lần kết thúc, lỗi: ' + (lastErr || 'không') + ')';
+  const diag = ' (chẩn đoán: ' + evN + ' kết quả, ' + endN + ' lần kết thúc, lỗi: ' + (lastErr || 'không') + ', chế độ: ' + (useCont ? 'liên tục' : 'từng đoạn') + ')';
   if (prac) { if (!hyp.length) { say('Chưa nghe thấy gì. Thử lại nhé!' + diag); return; } return evalWord(hyp); }
   if (!hyp.length) { if (!errShown) say('Chưa nghe thấy gì. Hãy thử lại nhé!' + diag); return; }
   const { a, b } = scope, ref = words.slice(a, b).map(w => w.n), al = align(ref, hyp);
